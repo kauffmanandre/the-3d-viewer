@@ -1,44 +1,86 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>The 3D Viewer</title>
-		<style>
-			body { margin: 0; }
-		</style>
-	</head>
-	<body>
-        <h1>The 3D Viewer</h1>
-		<script type="module">
-            import * as THREE from "./three.module.js";
 
-			const scene = new THREE.Scene();
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+<head>
+	<meta charset="utf-8">
+	<title>The 3D Viewer</title>
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+</head>
 
-			const renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+<body>
+	<h1>The 3D Viewer</h1>
+	<script type="module">
+		import * as THREE from "./three.module.js";
+		import { OBJLoader } from './OBJLoader.js';
 
-			const geometry = new THREE.BoxGeometry();
-			const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-			const cube = new THREE.Mesh( geometry, material );
-			scene.add( cube );
+		let object;
 
-			camera.position.z = 5;
+		// function loadModel() {
 
-			const animate = function () {
-				requestAnimationFrame( animate );
+		// 	object.traverse(function (child) {
 
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.01;
+		// 		if (child.isMesh) child.material.map = texture;
 
-				renderer.render( scene, camera );
-			};
+		// 	});
 
-            var content = document.createTextNode("<YOUR_CONTENT>");
-            document.body.appendChild(content);
+		// 	object.position.y = - 95;
+		// 	scene.add(object);
 
-			animate();
-		</script>
-	</body>
+		// }
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		const geometry = new THREE.BoxGeometry();
+		const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+		const cube = new THREE.Mesh(geometry, material);
+		scene.add(cube);
+
+		camera.position.z = 5;
+
+		const loader = new OBJLoader();
+		loader.load('camel_b.obj', function (obj) {
+
+			object = obj;
+			console.log(obj);
+			//scene.Add(obj);
+			let geometry = obj.children[0].geometry;
+			let camel = new THREE.Mesh(geometry, material);
+			scene.add(camel);
+
+		}, onProgress, onError);
+
+		function onProgress(xhr) {
+			console.log("In progress");
+		}
+
+		function onError(error) {
+			console.log("Error file loading");
+		}
+
+
+		const animate = function () {
+			requestAnimationFrame(animate);
+
+			cube.rotation.x += 0.01;
+			cube.rotation.y += 0.01;
+
+			renderer.render(scene, camera);
+		};
+
+		var content = document.createTextNode("<YOUR_CONTENT>");
+		document.body.appendChild(content);
+
+		animate();
+	</script>
+</body>
+
 </html>
